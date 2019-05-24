@@ -4,7 +4,7 @@
 #include <cuda_runtime.h>
 #include "cublas_v2.h"
 
-#include "implicit/cuda/als.h"
+#include "implicit/cuda/partial_als.h"
 #include "implicit/cuda/utils.cuh"
 
 namespace implicit {
@@ -94,6 +94,7 @@ __global__ void partial_least_squares_cg_kernel(int first_user,
 __global__ void partial_l2_regularize_kernel(int factors, float regularization, float * YtY) {
     YtY[threadIdx.x * factors + threadIdx.x] += regularization;
 }
+
 CudaPartialLeastSquaresSolver::CudaPartialLeastSquaresSolver(int factors)
     : YtY(factors, factors, NULL) {
     CHECK_CUBLAS(cublasCreate(&blas_handle));

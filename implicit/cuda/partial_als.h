@@ -11,12 +11,20 @@ struct CudaPartialLeastSquaresSolver {
     explicit CudaPartialLeastSquaresSolver(int factors);
     ~CudaPartialLeastSquaresSolver();
 
-    void least_squares(const CudaCSRMatrix & Cui,
+    void least_squares_init(const CudaDenseMatrix & Y);
+
+    void least_squares(
+                       int first_user,
+                       int user_count,
+                       const CudaCSRMatrix & Cui,
                        CudaDenseMatrix * X, const CudaDenseMatrix & Y,
                        float regularization,
                        int cg_steps) const;
 
-    float calculate_loss(const CudaCSRMatrix & Cui,
+    float calculate_loss(
+                        int first_user,
+                        int user_count,
+                        const CudaCSRMatrix & Cui,
                         const CudaDenseMatrix & X,
                         const CudaDenseMatrix & Y,
                         float regularization);
