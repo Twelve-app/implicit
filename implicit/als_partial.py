@@ -11,7 +11,7 @@ from .recommender_base import MatrixFactorizationBase
 log = logging.getLogger("implicit")
 
 
-class AlternatingLeastSquares(MatrixFactorizationBase):
+class PartialAlternatingLeastSquares(MatrixFactorizationBase):
     """ Alternating Least Squares
 
     A Recommendation Model based off the algorithms described in the paper 'Collaborative
@@ -42,7 +42,7 @@ class AlternatingLeastSquares(MatrixFactorizationBase):
 
     def __init__(self, item_users_shape, factors=128, regularization=0.01, dtype=np.float32,
                  iterations=15, calculate_training_loss=False):
-        super(AlternatingLeastSquares, self).__init__()
+        super(PartialAlternatingLeastSquares, self).__init__()
 
         # currently there are some issues when training on the GPU when some of the warps
         # don't have full factors. Round up to be warp aligned.
