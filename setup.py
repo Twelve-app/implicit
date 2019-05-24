@@ -58,6 +58,7 @@ def define_extensions(use_cython=False):
         modules.append(Extension("implicit.cuda._cuda",
                                  [os.path.join("implicit", "cuda", "_cuda" + src_ext),
                                   os.path.join("implicit", "cuda", "als.cu"),
+                                  os.path.join("implicit", "cuda", "partial_als.cu"),
                                   os.path.join("implicit", "cuda", "bpr.cu"),
                                   os.path.join("implicit", "cuda", "matrix.cu")],
                                  language="c++",
