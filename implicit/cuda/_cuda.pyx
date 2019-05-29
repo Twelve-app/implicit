@@ -39,6 +39,8 @@ cdef extern from "partial_als.h" namespace "implicit" nogil:
         float calculate_loss(int start, int size, const CudaCSRMatrix & Cui, const CudaDenseMatrix & X,
                              const CudaDenseMatrix & Y, float regularization) except +
 
+        void least_squares_init(const CudaDenseMatrix & Y) except +
+
 
 cdef extern from "bpr.h" namespace "implicit" nogil:
     cdef pair[int, int] bpr_update(const CudaVector[int] & userids,
@@ -130,6 +132,9 @@ cdef class CuPartialLeastSquaresSolver(object):
     def calculate_loss(self, int start, int size, CuCSRMatrix cui, CuDenseMatrix X, CuDenseMatrix Y,
                        float regularization):
         return self.c_solver.calculate_loss(start, size, dereference(cui.c_matrix), dereference(X.c_matrix), dereference(Y.c_matrix), regularization)
+
+    def least_squares_init(self, CuDenseMatrix Y):
+        self.c_solver.least_squares_init(dereference(Y.c_matrix))
 
     def __dealloc__(self):
         del self.c_solver
