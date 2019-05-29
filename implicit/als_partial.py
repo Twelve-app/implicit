@@ -115,7 +115,7 @@ class PartialAlternatingLeastSquares(MatrixFactorizationBase):
         log.debug("Running %i ALS iterations", self.iterations)
         with tqdm.tqdm(total=self.iterations, disable=not show_progress) as progress:
             for iteration in range(self.iterations):
-                iteration_data = matrix_generator()
+                iteration_data = next(matrix_generator)
                 s = time.time()
                 self.solver.least_squares_init(Y)
                 for start_user, size, user_items in iteration_data.user_items():
