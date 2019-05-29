@@ -84,7 +84,7 @@ class PartialAlternatingLeastSquares(MatrixFactorizationBase):
         self.gpu_user_factors = implicit.cuda.CuDenseMatrix(self.user_factors.astype(np.float32))
         self.gpu_item_factors = implicit.cuda.CuDenseMatrix(self.item_factors.astype(np.float32))
 
-        self.solver = implicit.cuda.CuLeastSquaresSolver(self.factors)
+        self.solver = implicit.cuda.CudaPartialLeastSquaresSolver(self.factors)
 
     def fit_generators(self, matrix_generator, show_progress=True):
         """ Factorizes the item_users matrix.
