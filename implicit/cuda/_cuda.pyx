@@ -98,14 +98,29 @@ cdef class CuLeastSquaresSolver(object):
 
     def least_squares(self, CuCSRMatrix cui, CuDenseMatrix X, CuDenseMatrix Y,
                       float regularization, int cg_steps):
-        self.c_solver.least_squares(dereference(cui.c_matrix), X.c_matrix, dereference(Y.c_matrix),
-                                    regularization, cg_steps)
+        self.c_solver.least_squares(dereference(cui.c_matrix), X.c_matrix, dereference(Y.c_matrix), regularization, cg_steps)
 
     def calculate_loss(self, CuCSRMatrix cui, CuDenseMatrix X, CuDenseMatrix Y,
                        float regularization):
-        return self.c_solver.calculate_loss(dereference(cui.c_matrix), dereference(X.c_matrix),
+        return self.c_solver.calculate_loss(dereference(cui.c_matrix), dereference(X.c_matrix), dereference(Y.c_matrix), regularization)
 
-                                            dereference(Y.c_matrix), regularization)
+    def __dealloc__(self):
+        del self.c_solver
+
+
+cdef class CuPartialLeastSquaresSolver(object):
+    cdef CudaPartialLeastSquaresSolver * c_solver
+
+    def __cinit__(self, int factors):
+        self.c_solver = new CudaPartialLeastSquaresSolver(factors)
+
+    def least_squares(self, CuCSRMatrix cui, CuDenseMatrix X, CuDenseMatrix Y,
+                      float regularization, int cg_steps):
+        self.c_solver.least_squares(dereference(cui.c_matrix), X.c_matrix, dereference(Y.c_matrix), regularization, cg_steps)
+
+    def calculate_loss(self, CuCSRMatrix cui, CuDenseMatrix X, CuDenseMatrix Y,
+                       float regularization):
+        return self.c_solver.calculate_loss(dereference(cui.c_matrix), dereference(X.c_matrix), dereference(Y.c_matrix), regularization)
 
     def __dealloc__(self):
         del self.c_solver
