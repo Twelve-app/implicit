@@ -7,8 +7,12 @@ import numpy as np
 import tqdm
 
 from .recommender_base import MatrixFactorizationBase
+from collections import namedtuple
 
 log = logging.getLogger("implicit")
+
+
+MatrixGenerator = namedtuple("MatrixGenerator", ["user_items_generator", "item_users_generator"])
 
 
 class PartialAlternatingLeastSquares(MatrixFactorizationBase):
@@ -82,7 +86,7 @@ class PartialAlternatingLeastSquares(MatrixFactorizationBase):
 
         self.solver = implicit.cuda.CuLeastSquaresSolver(self.factors)
 
-    def fit_generators(self, item_users_generator, user_items_generator, show_progress=True):
+    def fit_generators(self, matrix_generator, show_progress=True):
         """ Factorizes the item_users matrix.
 
         After calling this method, the members 'user_factors' and 'item_factors' will be
@@ -98,7 +102,7 @@ class PartialAlternatingLeastSquares(MatrixFactorizationBase):
 
         Parameters
         ----------
-        item_users: csr_matrix
+        matrix_generator: csr_matrix
             Matrix of confidences for the liked items. This matrix should be a csr_matrix where
             the rows of the matrix are the item, the columns are the users that liked that item,
             and the value is the confidence that the user liked the item.
@@ -111,16 +115,17 @@ class PartialAlternatingLeastSquares(MatrixFactorizationBase):
         log.debug("Running %i ALS iterations", self.iterations)
         with tqdm.tqdm(total=self.iterations, disable=not show_progress) as progress:
             for iteration in range(self.iterations):
+                iteration_data = matrix_generator()
                 s = time.time()
                 self.solver.least_squares_init(Y)
-                for user_items in user_items_generator:
-                    start_user, size, Cui = implicit.cuda.CuCSRMatrix(user_items)
+                for start_user, size, user_items in iteration_data.user_items():
+                    Cui = implicit.cuda.CuCSRMatrix(user_items)
                     self.solver.least_squares(start_user, size, Cui, X, Y, self.regularization, self.cg_steps)
                 progress.update(.5)
 
                 self.solver.least_squares_init(X)
-                for item_users in item_users_generator:
-                    start_item, size, Ciu = implicit.cuda.CuCSRMatrix(item_users)
+                for start_item, size, item_users in iteration_data.item_users():
+                    Ciu = implicit.cuda.CuCSRMatrix(item_users)
                     self.solver.least_squares(start_item, size, Ciu, Y, X, self.regularization, self.cg_steps)
                 progress.update(.5)
 
