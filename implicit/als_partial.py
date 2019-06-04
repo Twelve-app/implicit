@@ -118,13 +118,13 @@ class PartialAlternatingLeastSquares(MatrixFactorizationBase):
                 iteration_data = next(matrix_generator)
                 s = time.time()
                 self.solver.least_squares_init(Y)
-                for start_user, size, user_items in iteration_data.user_items:
+                for start_user, size, user_items in tqdm.tqdm(iteration_data.user_items):
                     Cui = implicit.cuda.CuCSRMatrix(user_items)
                     self.solver.least_squares(start_user, size, Cui, X, Y, self.regularization, self.cg_steps)
                 progress.update(.5)
 
                 self.solver.least_squares_init(X)
-                for start_item, size, item_users in iteration_data.item_users:
+                for start_item, size, item_users in tqdm.tqdm(iteration_data.item_users):
                     Ciu = implicit.cuda.CuCSRMatrix(item_users)
                     self.solver.least_squares(start_item, size, Ciu, Y, X, self.regularization, self.cg_steps)
                 progress.update(.5)
