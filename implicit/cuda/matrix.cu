@@ -47,7 +47,15 @@ CudaCSRMatrix::CudaCSRMatrix(int rows, int cols, int nonzeros,
     : rows(rows), cols(cols), nonzeros(nonzeros) {
 
     std::cout << (void*)indptr_ << ' ' << (void*)indices_ << ' ' << (void*)data_ << std::endl;
-    
+    for (int i = 0; i < 10; ++i) {
+      std::cout << indptr_[i] << ' ';
+    }
+    std::cout << " ... ";
+    for (int i = rows - 9; i < rows + 1; ++i) {
+      std::cout << indptr_[i] << ' ';
+    }
+    std::cout << std::endl;
+
     CHECK_CUDA(cudaMalloc(&indptr, (rows + 1) * sizeof(int)));
     CHECK_CUDA(cudaMemcpy(indptr, indptr_, (rows + 1)*sizeof(int), cudaMemcpyHostToDevice));
 
