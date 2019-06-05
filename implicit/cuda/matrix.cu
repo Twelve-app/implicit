@@ -5,6 +5,8 @@
 #include "implicit/cuda/matrix.h"
 #include "implicit/cuda/utils.cuh"
 
+#include <iostream>
+
 namespace implicit {
 template <typename T>
 CudaVector<T>::CudaVector(int size, const T * host_data)
@@ -44,6 +46,8 @@ CudaCSRMatrix::CudaCSRMatrix(int rows, int cols, int nonzeros,
                              const int * indptr_, const int * indices_, const float * data_)
     : rows(rows), cols(cols), nonzeros(nonzeros) {
 
+    std::cout << (void*)indptr_ << ' ' << (void*)indices_ << ' ' << (void*)data_ << std::endl;
+    
     CHECK_CUDA(cudaMalloc(&indptr, (rows + 1) * sizeof(int)));
     CHECK_CUDA(cudaMemcpy(indptr, indptr_, (rows + 1)*sizeof(int), cudaMemcpyHostToDevice));
 
