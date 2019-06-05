@@ -174,3 +174,36 @@ class PartialAlternatingLeastSquares(MatrixFactorizationBase):
 
         X.to_host(self.user_factors)
         Y.to_host(self.item_factors)
+
+    # noinspection PyPep8Naming
+    def fit_partial_users(self, user_items_generator):
+        X = self.gpu_user_factors
+        Y = self.gpu_item_factors
+
+        for user_items in tqdm.tqdm(user_items_generator):
+            self._fit_partial_step(user_items, X, Y)
+            del user_items
+
+        X.to_host(self.user_factors)
+        Y.to_host(self.item_factors)
+
+    # noinspection PyPep8Naming
+    def fit_partial_items(self, item_users_generator):
+        X = self.gpu_user_factors
+        Y = self.gpu_item_factors
+
+        for item_users in tqdm.tqdm(item_users_generator):
+            self._fit_partial_step(item_users, Y, X)
+            del item_users
+
+        X.to_host(self.user_factors)
+        Y.to_host(self.item_factors)
+
+    def loss(self, user_items):
+        X = self.gpu_user_factors
+        Y = self.gpu_item_factors
+
+        Cui = implicit.cuda.CuCSRMatrix(user_items)
+        loss = self.solver.calculate_loss(Cui, X, Y, self.regularization)
+        del Cui
+        log.info("Final training loss %.4f", loss)
