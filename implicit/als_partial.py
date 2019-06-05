@@ -11,7 +11,6 @@ from collections import namedtuple
 
 log = logging.getLogger("implicit")
 
-
 MatrixGenerator = namedtuple("MatrixGenerator", ["user_items", "item_users"])
 
 
@@ -121,12 +120,16 @@ class PartialAlternatingLeastSquares(MatrixFactorizationBase):
                 for start_user, size, user_items in tqdm.tqdm(iteration_data.user_items):
                     Cui = implicit.cuda.CuCSRMatrix(user_items)
                     self.solver.least_squares(start_user, size, Cui, X, Y, self.regularization, self.cg_steps)
+                    del Cui
+                    del user_items
                 progress.update(.5)
 
                 self.solver.least_squares_init(X)
                 for start_item, size, item_users in tqdm.tqdm(iteration_data.item_users):
                     Ciu = implicit.cuda.CuCSRMatrix(item_users)
                     self.solver.least_squares(start_item, size, Ciu, Y, X, self.regularization, self.cg_steps)
+                    del Ciu
+                    del item_users
                 progress.update(.5)
 
                 if self.fit_callback:
@@ -137,6 +140,36 @@ class PartialAlternatingLeastSquares(MatrixFactorizationBase):
                     progress.set_postfix({"loss": loss})
 
         if self.calculate_training_loss:
+            log.info("Final training loss %.4f", loss)
+
+        X.to_host(self.user_factors)
+        Y.to_host(self.item_factors)
+
+    def _fit_partial_step(self, user_items, X, Y):
+        s = time.time()
+        log.debug("Computing YtY")
+        self.solver.least_squares_init(Y)
+        log.debug("YtY done in %03d s" % (time.time() - s))
+
+        s = time.time()
+        start_user, size, user_items = user_items
+        Cui = implicit.cuda.CuCSRMatrix(user_items)
+        self.solver.least_squares(start_user, size, Cui, X, Y, self.regularization, self.cg_steps)
+        del Cui
+        log.debug("Computed step in %03d s" % (time.time() - s))
+
+    # noinspection PyPep8Naming
+    def fit_partial(self, user_items, item_users):
+        X = self.gpu_user_factors
+        Y = self.gpu_item_factors
+
+        self._fit_partial_step(user_items, X, Y)
+        self._fit_partial_step(item_users, Y, X)
+
+        if self.calculate_training_loss:
+            Cui = implicit.cuda.CuCSRMatrix(user_items)
+            loss = self.solver.calculate_loss(Cui, X, Y, self.regularization)
+            del Cui
             log.info("Final training loss %.4f", loss)
 
         X.to_host(self.user_factors)
