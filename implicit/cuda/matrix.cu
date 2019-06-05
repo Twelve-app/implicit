@@ -48,11 +48,11 @@ CudaCSRMatrix::CudaCSRMatrix(int rows, int cols, int nonzeros,
 
     std::cout << (void*)indptr_ << ' ' << (void*)indices_ << ' ' << (void*)data_ << std::endl;
     for (int i = 0; i < 10; ++i) {
-      std::cout << indptr_[i] << ' ';
+      std::cout << indptr_[i] << std::endl;
     }
-    std::cout << " ... ";
+    std::cout << " ... " << std::endl   ;
     for (int i = rows - 9; i < rows + 1; ++i) {
-      std::cout << indptr_[i] << ' ';
+      std::cout << indptr_[i] << std::endl;
     }
     std::cout << std::endl;
 
