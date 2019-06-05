@@ -46,7 +46,7 @@ CudaCSRMatrix::CudaCSRMatrix(int rows, int cols, int nonzeros,
                              const int * indptr_, const int * indices_, const float * data_)
     : rows(rows), cols(cols), nonzeros(nonzeros) {
 
-    std::cout << row << ' ' << cols << ' ' << nonzeros << std::endl;
+    std::cout << rows << ' ' << cols << ' ' << nonzeros << std::endl;
     std::cout << (void*)indptr_ << ' ' << (void*)indices_ << ' ' << (void*)data_ << std::endl;
     for (int i = 0; i < 10; ++i) {
       std::cout << indptr_[i] << std::endl;
