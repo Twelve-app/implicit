@@ -202,8 +202,8 @@ class PartialAlternatingLeastSquares(MatrixFactorizationBase):
     def loss(self, user_items):
         X = self.gpu_user_factors
         Y = self.gpu_item_factors
-
+        start_user, size, user_items = user_items
         Cui = implicit.cuda.CuCSRMatrix(user_items)
-        loss = self.solver.calculate_loss(Cui, X, Y, self.regularization)
+        loss = self.solver.calculate_loss(start_user, size, Cui, X, Y, self.regularization)
         del Cui
         log.info("Final training loss %.4f", loss)
