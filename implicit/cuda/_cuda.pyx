@@ -34,12 +34,12 @@ cdef extern from "partial_als.h" namespace "implicit" nogil:
     cdef cppclass CudaPartialLeastSquaresSolver:
         CudaPartialLeastSquaresSolver(int factors) except +
         void least_squares(int start, int size, const CudaCSRMatrix & Cui, CudaDenseMatrix * X,
-                           const CudaDenseMatrix & Y, float regularization, int cg_steps) except +
+                           const CudaDenseMatrix & Y, int cg_steps) except +
 
         float calculate_loss(int start, int size, const CudaCSRMatrix & Cui, const CudaDenseMatrix & X,
                              const CudaDenseMatrix & Y, float regularization) except +
 
-        void least_squares_init(const CudaDenseMatrix & Y) except +
+        void least_squares_init(const CudaDenseMatrix & Y, float regularization) except +
 
 
 cdef extern from "bpr.h" namespace "implicit" nogil:
