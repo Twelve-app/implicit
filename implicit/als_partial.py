@@ -148,13 +148,13 @@ class PartialAlternatingLeastSquares(MatrixFactorizationBase):
     def _fit_partial_step(self, user_items, X, Y):
         s = time.time()
         log.debug("Computing YtY")
-        self.solver.least_squares_init(Y)
+        self.solver.least_squares_init(Y, self.regularization)
         log.debug("YtY done in %03d s" % (time.time() - s))
 
         s = time.time()
         start_user, size, user_items = user_items
         Cui = implicit.cuda.CuCSRMatrix(user_items)
-        self.solver.least_squares(start_user, size, Cui, X, Y, self.regularization, self.cg_steps)
+        self.solver.least_squares(start_user, size, Cui, X, Y, self.cg_steps)
         del Cui
         log.debug("Computed step in %03d s" % (time.time() - s))
 

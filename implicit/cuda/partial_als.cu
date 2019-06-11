@@ -101,7 +101,8 @@ CudaPartialLeastSquaresSolver::CudaPartialLeastSquaresSolver(int factors)
 }
 
 void CudaPartialLeastSquaresSolver::least_squares_init(
-                                           const CudaDenseMatrix & Y
+                                           const CudaDenseMatrix & Y,
+                                           float regularization
 ) {
     int item_count = Y.rows, factors = Y.cols;
 
@@ -120,6 +121,11 @@ void CudaPartialLeastSquaresSolver::least_squares_init(
                              YtY.data, factors));
 
     CHECK_CUDA(cudaDeviceSynchronize());
+
+    // regularize the matrix
+    partial_l2_regularize_kernel<<<1, factors>>>(factors, regularization, YtY.data);
+    CHECK_CUDA(cudaDeviceSynchronize());
+
 }
 
 void CudaPartialLeastSquaresSolver::least_squares(
@@ -128,17 +134,12 @@ void CudaPartialLeastSquaresSolver::least_squares(
                                            const CudaCSRMatrix & Cui,
                                            CudaDenseMatrix * X,
                                            const CudaDenseMatrix & Y,
-                                           float regularization,
                                            int cg_steps) const {
     int item_count = Y.rows, factors = X->cols;
     if (X->cols != Y.cols) throw invalid_argument("X and Y should have the same number of columns");
     if (X->cols != YtY.cols) throw invalid_argument("Columns of X don't match number of factors");
     if (Cui.rows != X->rows) throw invalid_argument("Dimensionality mismatch between Cui and X");
     //if (Cui.cols != Y.rows) throw invalid_argument("Dimensionality mismatch between Cui and Y");
-
-    // regularize the matrix
-    partial_l2_regularize_kernel<<<1, factors>>>(factors, regularization, YtY.data);
-    CHECK_CUDA(cudaDeviceSynchronize());
 
     // TODO: multi-gpu support
     int devId;
