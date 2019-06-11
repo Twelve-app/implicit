@@ -55,6 +55,7 @@ def define_extensions(use_cython=False):
                for name in ['_als', '_nearest_neighbours', 'bpr', 'evaluation']]
 
     if CUDA:
+        print("Using ", src_ext)
         modules.append(Extension("implicit.cuda._cuda",
                                  [os.path.join("implicit", "cuda", "_cuda" + src_ext),
                                   os.path.join("implicit", "cuda", "als.cu"),
