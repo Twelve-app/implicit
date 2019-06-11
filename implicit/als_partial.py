@@ -4,7 +4,7 @@ import time
 
 import implicit.cuda
 import numpy as np
-import tqdm
+from tqdm.auto import tqdm
 
 from .recommender_base import MatrixFactorizationBase
 from collections import namedtuple
@@ -112,12 +112,12 @@ class PartialAlternatingLeastSquares(MatrixFactorizationBase):
         Y = self.gpu_item_factors
 
         log.debug("Running %i ALS iterations", self.iterations)
-        with tqdm.tqdm(total=self.iterations, disable=not show_progress) as progress:
+        with tqdm(total=self.iterations, disable=not show_progress) as progress:
             for iteration in range(self.iterations):
                 iteration_data = next(matrix_generator)
                 s = time.time()
                 self.solver.least_squares_init(Y)
-                for start_user, size, user_items in tqdm.tqdm(iteration_data.user_items):
+                for start_user, size, user_items in tqdm(iteration_data.user_items):
                     Cui = implicit.cuda.CuCSRMatrix(user_items)
                     self.solver.least_squares(start_user, size, Cui, X, Y, self.regularization, self.cg_steps)
                     del Cui
@@ -125,7 +125,7 @@ class PartialAlternatingLeastSquares(MatrixFactorizationBase):
                 progress.update(.5)
 
                 self.solver.least_squares_init(X)
-                for start_item, size, item_users in tqdm.tqdm(iteration_data.item_users):
+                for start_item, size, item_users in tqdm(iteration_data.item_users):
                     Ciu = implicit.cuda.CuCSRMatrix(item_users)
                     self.solver.least_squares(start_item, size, Ciu, Y, X, self.regularization, self.cg_steps)
                     del Ciu
@@ -180,7 +180,7 @@ class PartialAlternatingLeastSquares(MatrixFactorizationBase):
         X = self.gpu_user_factors
         Y = self.gpu_item_factors
 
-        for user_items in tqdm.tqdm(user_items_generator):
+        for user_items in tqdm(user_items_generator):
             self._fit_partial_step(user_items, X, Y)
             del user_items
 
@@ -192,7 +192,7 @@ class PartialAlternatingLeastSquares(MatrixFactorizationBase):
         X = self.gpu_user_factors
         Y = self.gpu_item_factors
 
-        for item_users in tqdm.tqdm(item_users_generator):
+        for item_users in tqdm(item_users_generator):
             self._fit_partial_step(item_users, Y, X)
             del item_users
 
