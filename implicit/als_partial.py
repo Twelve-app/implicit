@@ -175,35 +175,50 @@ class PartialAlternatingLeastSquares(MatrixFactorizationBase):
         X.to_host(self.user_factors)
         Y.to_host(self.item_factors)
 
+    def _create_progress(self, reset=True, total=None):
+        if not hasattr(self, "progress"):
+            self.progress = tqdm(leave=True)
+        if reset:
+            self.progress.reset(total=total)
+
     # noinspection PyPep8Naming
-    def fit_partial_users(self, user_items_generator):
+    def fit_partial_users(self, user_items_generator, total=None):
+        self._create_progress(total)
+
         X = self.gpu_user_factors
         Y = self.gpu_item_factors
 
         for user_items in tqdm(user_items_generator):
             self._fit_partial_step(user_items, X, Y)
             del user_items
+            self.progress.update()
 
         X.to_host(self.user_factors)
         Y.to_host(self.item_factors)
 
     # noinspection PyPep8Naming
-    def fit_partial_items(self, item_users_generator):
+    def fit_partial_items(self, item_users_generator, total=None):
+        self._create_progress(total)
+
         X = self.gpu_user_factors
         Y = self.gpu_item_factors
 
         for item_users in tqdm(item_users_generator):
             self._fit_partial_step(item_users, Y, X)
             del item_users
+            self.progress.update()
 
         X.to_host(self.user_factors)
         Y.to_host(self.item_factors)
 
     def loss(self, user_items):
+        self._create_progress(reset=False)
+
         X = self.gpu_user_factors
         Y = self.gpu_item_factors
         start_user, size, user_items = user_items
         Cui = implicit.cuda.CuCSRMatrix(user_items)
         loss = self.solver.calculate_loss(start_user, size, Cui, X, Y, self.regularization)
         del Cui
-        log.info("Final training loss %.4f", loss)
+        self.progress.set_postfix({"loss": loss})
+        #log.info("Final training loss %.4f", loss)
