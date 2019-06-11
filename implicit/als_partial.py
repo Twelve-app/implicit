@@ -178,6 +178,7 @@ class PartialAlternatingLeastSquares(MatrixFactorizationBase):
     def _create_progress(self, reset=True, total=None):
         if not hasattr(self, "progress"):
             self.progress = tqdm(leave=True)
+
         if reset:
             self.progress.reset(total=total)
 
@@ -188,7 +189,7 @@ class PartialAlternatingLeastSquares(MatrixFactorizationBase):
         X = self.gpu_user_factors
         Y = self.gpu_item_factors
 
-        for user_items in tqdm(user_items_generator):
+        for user_items in user_items_generator:
             self._fit_partial_step(user_items, X, Y)
             del user_items
             self.progress.update()
@@ -203,7 +204,7 @@ class PartialAlternatingLeastSquares(MatrixFactorizationBase):
         X = self.gpu_user_factors
         Y = self.gpu_item_factors
 
-        for item_users in tqdm(item_users_generator):
+        for item_users in item_users_generator:
             self._fit_partial_step(item_users, Y, X)
             del item_users
             self.progress.update()
