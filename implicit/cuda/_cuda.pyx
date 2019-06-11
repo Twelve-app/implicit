@@ -126,15 +126,15 @@ cdef class CuPartialLeastSquaresSolver(object):
         self.c_solver = new CudaPartialLeastSquaresSolver(factors)
 
     def least_squares(self, int start, int size, CuCSRMatrix cui, CuDenseMatrix X, CuDenseMatrix Y,
-                      float regularization, int cg_steps):
-        self.c_solver.least_squares(start, size, dereference(cui.c_matrix), X.c_matrix, dereference(Y.c_matrix), regularization, cg_steps)
+                      int cg_steps):
+        self.c_solver.least_squares(start, size, dereference(cui.c_matrix), X.c_matrix, dereference(Y.c_matrix), cg_steps)
 
     def calculate_loss(self, int start, int size, CuCSRMatrix cui, CuDenseMatrix X, CuDenseMatrix Y,
                        float regularization):
         return self.c_solver.calculate_loss(start, size, dereference(cui.c_matrix), dereference(X.c_matrix), dereference(Y.c_matrix), regularization)
 
-    def least_squares_init(self, CuDenseMatrix Y):
-        self.c_solver.least_squares_init(dereference(Y.c_matrix))
+    def least_squares_init(self, CuDenseMatrix Y, float regularization):
+        self.c_solver.least_squares_init(dereference(Y.c_matrix), regularization)
 
     def __dealloc__(self):
         del self.c_solver
