@@ -39,6 +39,7 @@ __global__ void partial_least_squares_cg_kernel(int first_user,
         for (int i = 0; i < factors; ++i) {
             temp -= x[i] * YtY[i * factors + threadIdx.x];
         }
+        printf("temp %i %i = %02f\n", blockIdx.x, threadIdx.x, temp);
         for (int index = indptr[u - first_user + 1]; index < indptr[u - first_user + 1]; ++index) {
             const float * Yi = &Y[indices[index] * factors];
             float confidence = data[index];

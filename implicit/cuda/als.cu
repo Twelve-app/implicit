@@ -38,6 +38,7 @@ __global__ void least_squares_cg_kernel(int factors, int user_count, int item_co
         for (int i = 0; i < factors; ++i) {
             temp -= x[i] * YtY[i * factors + threadIdx.x];
         }
+        printf("temp %i %i = %02f\n", blockIdx.x, threadIdx.x, temp);
         for (int index = indptr[u]; index < indptr[u + 1]; ++index) {
             const float * Yi = &Y[indices[index] * factors];
             float confidence = data[index];
