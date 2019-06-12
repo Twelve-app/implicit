@@ -54,6 +54,7 @@ __global__ void partial_least_squares_cg_kernel(int first_user,
         p[threadIdx.x] = r[threadIdx.x] = temp;
 
         float rsold = dot(r, r);
+        printf("rsold %i %i = %02f\n", blockIdx.x, threadIdx.x, rsold);
         if (rsold < 1e-20) continue;
 
         for (int it = 0; it < cg_steps; ++it) {
@@ -72,7 +73,7 @@ __global__ void partial_least_squares_cg_kernel(int first_user,
 
             // standard CG update
             float alpha = rsold / dot(p, Ap);
-            printf("alpha %i %i = %02f %02f %02f\n", blockIdx.x, threadIdx.x, p[threadIdx.x], Ap[threadIdx.x], alpha);
+            //printf("alpha %i %i = %02f %02f %02f\n", blockIdx.x, threadIdx.x, p[threadIdx.x], Ap[threadIdx.x], alpha);
             x[threadIdx.x] += alpha * p[threadIdx.x];
             r[threadIdx.x] -= alpha * Ap[threadIdx.x];
             float rsnew = dot(r, r);
