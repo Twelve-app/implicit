@@ -132,8 +132,8 @@ void CudaPartialLeastSquaresSolver::least_squares_init(
     printf("\n");
 
     for (int i = 0; i < factors; ++i) {
-        for (int j = 0; i < factors; ++j) {
-            printf("%02f", yty[i * factors + j]);
+        for (int j = 0; j < factors; ++j) {
+            printf("%02f ", yty[i * factors + j]);
         }
         printf("\n");
     }
