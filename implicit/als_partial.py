@@ -184,7 +184,7 @@ class PartialAlternatingLeastSquares(MatrixFactorizationBase):
 
     # noinspection PyPep8Naming
     def fit_partial_users(self, user_items_generator, total=None):
-        self._create_progress(total)
+        self._create_progress(total=total)
 
         X = self.gpu_user_factors
         Y = self.gpu_item_factors
@@ -199,7 +199,7 @@ class PartialAlternatingLeastSquares(MatrixFactorizationBase):
 
     # noinspection PyPep8Naming
     def fit_partial_items(self, item_users_generator, total=None):
-        self._create_progress(total)
+        self._create_progress(total=total)
 
         X = self.gpu_user_factors
         Y = self.gpu_item_factors
