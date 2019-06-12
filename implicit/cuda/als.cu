@@ -126,6 +126,21 @@ void CudaLeastSquaresSolver::least_squares(const CudaCSRMatrix & Cui,
     l2_regularize_kernel<<<1, factors>>>(factors, regularization, YtY.data);
     CHECK_CUDA(cudaDeviceSynchronize());
 
+    float yty[factors * factors];
+    YtY.to_host(yty);
+
+    printf("\n");
+
+    for (int i = 0; i < factors; ++i) {
+        for (int j = 0; i < factors; ++j) {
+            printf("%02f", yty[i * factors + j]);
+        }
+        printf("\n");
+    }
+
+    printf("\n");
+
+
     // TODO: multi-gpu support
     int devId;
     CHECK_CUDA(cudaGetDevice(&devId));

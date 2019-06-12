@@ -222,4 +222,5 @@ class PartialAlternatingLeastSquares(MatrixFactorizationBase):
         loss = self.solver.calculate_loss(start_user, size, Cui, X, Y, self.regularization)
         del Cui
         self.progress.set_postfix({"loss": loss})
+        return loss
         #log.info("Final training loss %.4f", loss)
