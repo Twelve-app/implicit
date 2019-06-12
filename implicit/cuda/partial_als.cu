@@ -54,7 +54,7 @@ __global__ void partial_least_squares_cg_kernel(int first_user,
         p[threadIdx.x] = r[threadIdx.x] = temp;
 
         float rsold = dot(r, r);
-        printf("temp rsold %i %i = %02f %02f\n", blockIdx.x, threadIdx.x, temp, rsold);
+        //printf("temp rsold %i %i = %02f %02f\n", blockIdx.x, threadIdx.x, temp, rsold);
         if (rsold < 1e-20) continue;
 
         for (int it = 0; it < cg_steps; ++it) {
