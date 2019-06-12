@@ -38,7 +38,7 @@ __global__ void least_squares_cg_kernel(int factors, int user_count, int item_co
         for (int i = 0; i < factors; ++i) {
             temp -= x[i] * YtY[i * factors + threadIdx.x];
         }
-        printf("temp %i %i = %02f\n", blockIdx.x, threadIdx.x, temp);
+        //printf("temp %i %i = %02f\n", blockIdx.x, threadIdx.x, temp);
         for (int index = indptr[u]; index < indptr[u + 1]; ++index) {
             const float * Yi = &Y[indices[index] * factors];
             float confidence = data[index];
@@ -71,6 +71,7 @@ __global__ void least_squares_cg_kernel(int factors, int user_count, int item_co
 
             // standard CG update
             float alpha = rsold / dot(p, Ap);
+            printf("alpha %i %i = %02f %02f %02f\n", blockIdx.x, threadIdx.x, p[threadIdx.x], Ap[threadIdx.x], alpha);
             x[threadIdx.x] += alpha * p[threadIdx.x];
             r[threadIdx.x] -= alpha * Ap[threadIdx.x];
             float rsnew = dot(r, r);
@@ -127,6 +128,7 @@ void CudaLeastSquaresSolver::least_squares(const CudaCSRMatrix & Cui,
     l2_regularize_kernel<<<1, factors>>>(factors, regularization, YtY.data);
     CHECK_CUDA(cudaDeviceSynchronize());
 
+    /*
     float yty[factors * factors];
     YtY.to_host(yty);
 
@@ -140,7 +142,7 @@ void CudaLeastSquaresSolver::least_squares(const CudaCSRMatrix & Cui,
     }
 
     printf("\n");
-
+    */
 
     // TODO: multi-gpu support
     int devId;
